@@ -1,4 +1,3 @@
-
 library(shiny)
 library(readxl)
 library(tidyverse)
@@ -34,8 +33,8 @@ server = function(input, output, session) {
    
    
    
-   return(AnnuityDeathRate)
-   })
+   return(Annuitydf)
+   } )
   
   # Company options
   output$companyfilter <- renderUI({
@@ -110,17 +109,20 @@ server = function(input, output, session) {
   
   
   
-  output$data <- renderTable(
-    company_year_sex_df()
-      )
+  output$data <- renderTable({
+    
+    company_year_sex_df()%>%
+      group_by(Year)%>%
+      summarise(Exposure = sum(NumExposure, na.rm = TRUE),
+                Deaths = sum(NumDeaths, na.rm = TRUE),
+                Companies = n_distinct(Company)
+                )
+    
+                  }
+                          )
   
   
-  
-  
-  
-  
-  
-  
+
 #Code for downloading dynamic dataset  
   
   output$downloadlink <- renderUI({
