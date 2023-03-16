@@ -19,8 +19,14 @@ ui = fluidPage(
         ),
         
       mainPanel(
-        tableOutput('data')
+        textOutput("wd"),
+        tableOutput('data'),
+        plotOutput('plot')
+        
         
       )
     )
     )
+
+
+

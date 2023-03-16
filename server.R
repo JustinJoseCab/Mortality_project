@@ -122,6 +122,18 @@ server = function(input, output, session) {
                           )
   
   
+  output$plot <- renderPlot({
+    data <- company_year_sex_df()
+    data$ageRange <- cut(data$Age, breaks =c(0,18,30,40,50,60,70,80,110))
+    data$Sex = as.factor(data$Sex)
+    ggplot(data, aes(fill = Sex, y = NumExposure,x=ageRange))+
+      geom_bar(position='dodge', stat = "identity")
+    
+  })
+  
+   output$wd <- renderText(getwd())
+                           
+                        
 
 #Code for downloading dynamic dataset  
   
