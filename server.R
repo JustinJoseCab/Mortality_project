@@ -31,10 +31,48 @@ server = function(input, output, session) {
      filter(!is.infinite(DeathRate))%>%
      select(-(SumExposure:TwoYearExposure)) 
    
-   
-   
    return(Annuitydf)
+  
    } )
+  
+      
+  Insurance = reactive({
+    
+  
+    
+    lifeNames <- excel_sheets(path = input$uploadFiles$datapath[1])
+    lifeNames <- str_subset(lifeNames,pattern ="^Life")
+    lifeNames <- lifeNames[-1]
+    LifeNumInForce<- data.frame()
+    LifeNumDeaths<- data.frame()
+    start.time <- Sys.time() 
+    
+    
+    lapply(lifeNames,function(x){    
+      LifeNumInForce<<- bind_rows(LifeNumInForce,lifePullData(file = input$uploadFiles, sheetNames = x , index = "A10:R121")) #<< lexical scoping
+      LifeNumDeaths <<-bind_rows(LifeNumDeaths,lifePullData(file = input$uploadFiles, sheetNames = x, index = "A127:R238"))
+    }
+    
+    
+      
+    )
+    
+    
+    return(LifeNumInForce)
+    
+  
+  })
+  
+  output$insdata <- renderTable({
+    
+    
+    
+    Insurance()
+      
+
+    
+  })
+  
   
   # Company options
   output$companyfilter <- renderUI({
@@ -145,6 +183,7 @@ server = function(input, output, session) {
   })
   
   output$downloadData <- downloadHandler(
+    
     filename = function(){
       paste("filetest.csv")
     },
@@ -155,8 +194,34 @@ server = function(input, output, session) {
     
   )
   
+  output$insDownloadlink <- renderUI({
+    
+    downloadButton("insDownloadData","Download Insurance Data")
+    
+    
+  })
+
+ output$insDownloadData <- downloadHandler(
+   
+   filename = function(){
+     paste("Insurance Dataset.csv")
+   },
+   content = function(file){
+     write.csv(Insurance(),file,row.names = TRUE)
+     
+   }
+ )
+   
+   
+   
   
   
+  
+  
+  
+  
+  
+
   
  # output$files <- renderTable(input$uploadFiles) use this to test file dataframe. 
   
